@@ -50,7 +50,6 @@ target_dist = np.concatenate([np.min(np.arange(n_groups/2)*.5)+1+np.arange(n_gro
 target_dist = np.cumsum(target_dist/target_dist.sum())
 
 
-
 def obj_func(survive_probas):
     
     # survive_probas = survive_probas_sol/survive_probas_sol.max()
