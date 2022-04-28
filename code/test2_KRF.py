@@ -15,25 +15,9 @@ import os, warnings
 from joblib import Parallel, delayed
 
 warnings.simplefilter("ignore")
+home =  os.getcwd()[:-4] # Set working directory
 
-
-
-
-
-
-
-## TEST FUNCTION
-
-pop_size = 10000
-max_itera = 1000
-n_groups = 90-18
-# survive_probas = 1 - np.random.rand(91)*.1
-
-target_dist = np.concatenate([np.min(np.arange(n_groups/2)*.5)+1+np.arange(n_groups/2)*.5, 
-                             np.max(np.arange(n_groups/2)*.5)+1-np.arange(n_groups/2)*.5])
-target_dist = np.cumsum(target_dist/target_dist.sum())
-
-
+## DEFINE FUNCTIONS
 
 def obj_func(solution):
     
@@ -60,10 +44,46 @@ def obj_func(solution):
     ages_final = ages_history[:,-100::].mean(axis=1)
     ages_dist = np.cumsum(ages_final/ages_final.sum())
     
-    return np.max(np.abs(ages_dist - target_dist))
+    # return np.max(np.abs(ages_dist - target_dist))
+    return (np.max(np.abs(ages_dist - target_dist_cum)), ages_dist)
 
+## GET DATA
 
+df = pd.read_csv('%sdata/agedists_other.csv' % home)
 
+## TEST FUNCTION
+
+pop_size = 10000
+max_itera = 1000
+# n_groups = 90-18
+
+# survive_probas = 1 - np.random.rand(91)*.1
+
+# target_dist = np.max(np.arange(n_groups)*.5)+1  - np.arange(n_groups)*.5
+# target_dist = np.concatenate([np.min(np.arange(n_groups/2)*.5)+1+np.arange(n_groups/2)*.5, 
+#                               np.max(np.arange(n_groups/2)*.5)+1-np.arange(n_groups/2)*.5])
+
+# # Artificial target dist
+# n_groups = 10
+# stepsize=5
+# target_dist = np.arange(1,stepsize*(n_groups),stepsize)[::-1]
+
+target_dist = df.iloc[1833, -22:-1] #For now just do the check on the very first entry
+
+plt.figure(0, figsize=(5,5))
+
+plt.plot(target_dist/target_dist.sum())
+plt.xticks(rotation=45)
+plt.xlabel("Age group")
+plt.ylabel("P(age==x)")
+plt.title("Age distribution")
+
+plt.tight_layout()
+plt.show()
+        
+n_groups = len(target_dist) # Set number of groups to match age classes in data
+
+target_dist_cum = np.cumsum(target_dist/target_dist.sum())
 
 
 ## TEST OPTIMIZATION
@@ -85,15 +105,38 @@ step = 0
 while True:
     print(step)
     
-    fitness = Parallel(n_jobs=parallel_processes, verbose=0)(delayed(obj_func)(sol) for sol in pop) # Parallel
+    output = Parallel(n_jobs=parallel_processes, verbose=0)(delayed(obj_func)(sol) for sol in pop) # Parallel
+    fitness = [x[0] for x in output]
     best_idx = np.argmin(fitness)
     
     if fitness[best_idx] < best_fitness:
         best_sol = pop[best_idx]
         best_fitness = fitness[best_idx]
         best_sols.append(best_sol)
-        print(best_fitness)    
-        plt.plot(best_sol)
+        print(best_fitness)  
+        
+        numerical_dist = obj_func(best_sol)[1]
+        
+        plt.figure(1, figsize=(10,5))
+        
+        plt.subplot(121)
+        plt.plot(best_sol[:len(best_sol)//2], label =  "Survival probability")
+        plt.plot(best_sol[len(best_sol)//2:], label = "Activation rate")
+        plt.xticks(np.arange(n_groups), list(target_dist.index), rotation=45)
+        plt.legend(title="Parameter")
+        plt.xlabel("Age group")
+        plt.ylabel("Parameter value")
+        
+        plt.subplot(122)
+        plt.plot(numerical_dist, label = "simulated")
+        plt.plot(target_dist_cum, label = "observed")
+        plt.legend(title="Age distribution")
+        plt.xticks(rotation=45)
+        plt.xlabel("Age group (x)")
+        plt.ylabel("P(age group<=x)")
+        plt.title("Cumulative age distribution")
+        
+        plt.tight_layout()
         plt.show()
 
     sorter = np.argsort(fitness)

@@ -156,8 +156,8 @@ while True:
         plt.plot(target_dist_cum, label = "observed")
         plt.legend(title="Age distribution")
         plt.xticks(rotation=45)
-        plt.xlabel("Age group")
-        plt.ylabel("P(age>x)")
+        plt.xlabel("Age group (x)")
+        plt.ylabel("P(age group<=x)")
         plt.title("Cumulative age distribution")
         
         plt.tight_layout()
