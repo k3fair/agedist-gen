@@ -44,11 +44,15 @@ for i in range(df_countries_2020_other.shape[0]):
     dif_list = np.array([j-i for i, j in zip(df_countries_2020_other.iloc[i, -22:-2], df_countries_2020_other.iloc[i, 9:-1])])
     dec_count[i] = len(dif_list[dif_list<=0])
     
-    plt.plot(df_countries_2020_other.iloc[i, -22:-1]/df_countries_2020_other.iloc[i, -22:-1].sum())
+    if dec_count[i] >=18:
+        plt.plot(df_countries_2020_other.iloc[i, -22:-1]/df_countries_2020_other.iloc[i, -22:-1].sum())
+        plt.xticks(rotation=45)
+        plt.xlabel("Age group")    
+        plt.show()
 
-plt.xticks(rotation=45)
-plt.xlabel("Age group")    
-plt.show()
+# plt.xticks(rotation=45)
+# plt.xlabel("Age group")    
+# plt.show()
 
 
 plt.hist(dec_count)

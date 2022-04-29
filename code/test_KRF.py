@@ -55,6 +55,33 @@ def obj_func(survive_probas):
     
     return (np.max(np.abs(ages_dist - target_dist_cum)), ages_dist)
 
+# def obj_func(survive_probas):
+    
+#     # survive_probas = survive_probas_sol/survive_probas_sol.max()
+#     ages = np.random.randint(0, n_groups, size=pop_size).astype(int)
+#     ages_history = np.zeros((n_groups, max_itera))
+    
+#     for itera in range(max_itera):
+        
+#         trials = np.random.rand(pop_size)
+#         survival_probabilities = survive_probas[ages]
+#         survivals = trials <= survival_probabilities
+#         deaths = trials > survival_probabilities
+#         ages[survivals] += 1
+#         ages[ages==n_groups] -= 1
+#         ages[deaths] = 0
+        
+#         uages, freqs = np.unique(ages, return_counts=True)
+#         ages_history[uages, itera] = freqs
+
+#     # ages_final = np.zeros(n_groups)
+#     # uages, freqs = np.unique(ages, return_counts=True)
+#     # ages_final[uages] = freqs
+#     ages_final = ages_history[:,-100::].mean(axis=1)
+#     ages_dist_probs = ages_final/ages_final.sum()
+    
+#     return (np.max(np.abs(ages_dist_probs - target_dist_probs)), ages_dist_probs)
+
 
 # ## TEST CODE
 # pop_size = 10000
@@ -104,7 +131,7 @@ max_itera = 1000
 
 target_dist = df.iloc[4431, -22:-1] #For now just do the check on the very first entry
 n_groups = len(target_dist) # Set number of groups to match age classes in data
-
+target_dist_probs = target_dist/target_dist.sum()
 target_dist_cum = np.cumsum(target_dist/target_dist.sum())
 
 ## p_n check
@@ -154,6 +181,7 @@ while True:
         plt.subplot(122)
         plt.plot(numerical_dist, label = "simulated")
         plt.plot(target_dist_cum, label = "observed")
+        plt.plot()
         plt.legend(title="Age distribution")
         plt.xticks(rotation=45)
         plt.xlabel("Age group (x)")
