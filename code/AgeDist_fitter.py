@@ -75,3 +75,26 @@ plt.legend()
 plt.show()
 
 print(wasserstein_distance(target_dist_cum, fit_y))
+
+# Define the expoential decay equation we're using for fitting
+def decayfcn(x, A, b, k):
+    y = A*np.exp(-k*(x**b))
+    return y
+
+# Fit curve
+ydat = np.asarray(target_dist/target_dist.sum())
+parameters, covariance = curve_fit(decayfcn, xdat, ydat)
+
+fit_A = parameters[0]
+fit_b = parameters[1]
+fit_k = parameters[2]
+
+fit_y = decayfcn(xdat, fit_A, fit_b, fit_k)
+fit_y[fit_y>1] = 1 
+
+plt.plot(xdat, ydat, 'o', label='data')
+plt.plot(xdat, fit_y, '-', label='fit')
+plt.legend()
+plt.show()
+
+print(wasserstein_distance(target_dist/target_dist.sum(), fit_y))
