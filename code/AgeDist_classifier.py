@@ -37,6 +37,7 @@ df.loc[df.monocheck==0].to_csv('%sdata/agedists_other.csv' % home)
 df_countries = df.loc[df.Type=="Country/Area"] 
 df_countries_2020 = df_countries.loc[df_countries["Reference date (as of 1 July)"]==2020]
 df_countries_2020_other=df_countries_2020.loc[df_countries_2020.monocheck==0]
+df_countries_2020_md=df_countries_2020.loc[df_countries_2020.monocheck==1]
 
 dec_count=np.zeros(df_countries_2020_other.shape[0])
 for i in range(df_countries_2020_other.shape[0]):
@@ -44,7 +45,7 @@ for i in range(df_countries_2020_other.shape[0]):
     dif_list = np.array([j-i for i, j in zip(df_countries_2020_other.iloc[i, -22:-2], df_countries_2020_other.iloc[i, 9:-1])])
     dec_count[i] = len(dif_list[dif_list<=0])
     
-    if dec_count[i] >=18:
+    if dec_count[i] >=19:
         plt.plot(df_countries_2020_other.iloc[i, -22:-1]/df_countries_2020_other.iloc[i, -22:-1].sum())
         plt.xticks(rotation=45)
         plt.xlabel("Age group")    
@@ -60,8 +61,12 @@ plt.show()
 
 for i in range(df_countries_2020_other.shape[0]):
     
-    plt.plot(df_countries_2020_other.iloc[i, -22:-1]/df_countries_2020_other.iloc[i, -22:-1].sum())
-
+    plt.plot(np.cumsum(df_countries_2020_other.iloc[i, -22:-1]/df_countries_2020_other.iloc[i, -22:-1].sum()))
+    
+for i in range(df_countries_2020_md.shape[0]):
+    
+    plt.plot(np.cumsum(df_countries_2020_md.iloc[i, -22:-1]/df_countries_2020_md.iloc[i, -22:-1].sum()), '--')
+    
 plt.xticks(rotation=45)
 plt.xlabel("Age group")    
 plt.show()

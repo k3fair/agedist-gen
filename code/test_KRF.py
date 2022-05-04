@@ -109,7 +109,7 @@ def obj_func(survive_probas):
 
 ## GET DATA
 
-df = pd.read_csv('%sdata/agedists_md.csv' % home)
+df = pd.read_csv('%sdata/agedists_other.csv' % home)
 
 
 ## TEST FUNCTION
@@ -129,10 +129,21 @@ max_itera = 1000
 # stepsize=5
 # target_dist = np.arange(1,stepsize*(n_groups),stepsize)[::-1]
 
-target_dist = df.iloc[4431, -22:-1] #For now just do the check on the very first entry
+target_dist = df.iloc[1833, -22:-1] #For now just do the check on the very first entry
 n_groups = len(target_dist) # Set number of groups to match age classes in data
-target_dist_probs = target_dist/target_dist.sum()
 target_dist_cum = np.cumsum(target_dist/target_dist.sum())
+
+
+plt.figure(0, figsize=(5,5))
+
+plt.plot(target_dist/target_dist.sum())
+plt.xticks(rotation=45)
+plt.xlabel("Age group")
+plt.ylabel("P(age==x)")
+plt.title("Age distribution")
+
+plt.tight_layout()
+plt.show()
 
 ## p_n check
 print(f"Minimum possible p_n value: {p_n_min_getter(target_dist)}")
