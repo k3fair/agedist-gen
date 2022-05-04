@@ -19,9 +19,9 @@ from scipy.stats import wasserstein_distance
 home =  os.getcwd()[:-4]
 
 # Read in age distribution data for distributions which are not monotonic decreasing
-df = pd.read_csv('%sdata/agedists_md.csv' % home)
+df = pd.read_csv('%sdata/agedists_other.csv' % home)
 
-target_dist = df.iloc[100, -22:-1] #For now just do the check on the very first entry
+target_dist = df.iloc[55, -22:-1] #For now just do the check on the very first entry
 n_groups = len(target_dist) # Set number of groups to match age classes in data
 target_dist_cum = np.cumsum(target_dist/target_dist.sum())
 
@@ -58,15 +58,15 @@ fit_k = parameters[2]
 # print(fit_B)
 # print(fit_k)
 
-fit_y = mmfcn(xdat, fit_A, fit_B, fit_k)
-fit_y[fit_y>1] = 1 
+fit_y_old = mmfcn(xdat, fit_A, fit_B, fit_k)
+fit_y_old[fit_y_old>1] = 1 
 
 plt.plot(xdat, ydat, 'o', label='data')
-plt.plot(xdat, fit_y, '-', label='fit')
+plt.plot(xdat, fit_y_old, '-', label='fit')
 plt.legend()
 plt.show()
 
-fit_y_noncum = fit_y.copy()
+fit_y_noncum = fit_y_old.copy()
 fit_y_noncum[1:] -= fit_y_noncum[:-1].copy()
 
 plt.plot(xdat, target_dist/target_dist.sum() , 'o', label='data')
@@ -74,11 +74,11 @@ plt.plot(xdat, fit_y_noncum , '-', label='fit')
 plt.legend()
 plt.show()
 
-print(wasserstein_distance(target_dist_cum, fit_y))
+print(wasserstein_distance(target_dist_cum, fit_y_old))
 
 # Define the expoential decay equation we're using for fitting
 def decayfcn(x, A, b, k):
-    y = A*np.exp(-k*(x**b))
+    y = A*np.exp(-b*(x**k))
     return y
 
 # Fit curve
@@ -94,6 +94,12 @@ fit_y[fit_y>1] = 1
 
 plt.plot(xdat, ydat, 'o', label='data')
 plt.plot(xdat, fit_y, '-', label='fit')
+plt.legend()
+plt.show()
+
+plt.plot(xdat, np.cumsum(ydat), 'o', label='data')
+plt.plot(xdat, np.cumsum(fit_y), '-', label='fit')
+plt.plot(xdat, fit_y_old, '--', label='fit (cum-based)')
 plt.legend()
 plt.show()
 
