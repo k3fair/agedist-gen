@@ -45,11 +45,11 @@ for i in range(df_countries_2020_other.shape[0]):
     dif_list = np.array([j-i for i, j in zip(df_countries_2020_other.iloc[i, -22:-2], df_countries_2020_other.iloc[i, 9:-1])])
     dec_count[i] = len(dif_list[dif_list<=0])
     
-    if dec_count[i] >=19:
-        plt.plot(df_countries_2020_other.iloc[i, -22:-1]/df_countries_2020_other.iloc[i, -22:-1].sum())
-        plt.xticks(rotation=45)
-        plt.xlabel("Age group")    
-        plt.show()
+    # if dec_count[i] >=19:
+    #     plt.plot(df_countries_2020_other.iloc[i, -22:-1]/df_countries_2020_other.iloc[i, -22:-1].sum())
+    #     plt.xticks(rotation=45)
+    #     plt.xlabel("Age group")    
+    #     plt.show()
 
 # plt.xticks(rotation=45)
 # plt.xlabel("Age group")    
@@ -61,12 +61,17 @@ plt.show()
 
 for i in range(df_countries_2020_other.shape[0]):
     
-    plt.plot(np.cumsum(df_countries_2020_other.iloc[i, -22:-1]/df_countries_2020_other.iloc[i, -22:-1].sum()))
+    plt.plot(np.cumsum(df_countries_2020_other.iloc[i, -22:-1]/df_countries_2020_other.iloc[i, -22:-1].sum()), 'b', label="Other")
     
 for i in range(df_countries_2020_md.shape[0]):
     
-    plt.plot(np.cumsum(df_countries_2020_md.iloc[i, -22:-1]/df_countries_2020_md.iloc[i, -22:-1].sum()), '--')
+    plt.plot(np.cumsum(df_countries_2020_md.iloc[i, -22:-1]/df_countries_2020_md.iloc[i, -22:-1].sum()), 'r--', label = "Monotonic decreasing")
     
 plt.xticks(rotation=45)
-plt.xlabel("Age group")    
+plt.xlabel("Age group")
+# plt.legend()    
 plt.show()
+
+# Save 2 sets of age distributions, monotonic decreasing (md) and other
+df_countries_2020_md.to_csv('%sdata/agedists_countries2020_md.csv' % home) 
+df_countries_2020_other.to_csv('%sdata/agedists_countries2020_other.csv' % home) 

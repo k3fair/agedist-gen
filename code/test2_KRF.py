@@ -49,7 +49,7 @@ def obj_func(solution):
 
 ## GET DATA
 
-df = pd.read_csv('%sdata/agedists_other.csv' % home)
+df = pd.read_csv('%sdata/agedists_countries2020_other.csv' % home)
 
 ## TEST FUNCTION
 
@@ -68,23 +68,42 @@ max_itera = 1000
 # stepsize=5
 # target_dist = np.arange(1,stepsize*(n_groups),stepsize)[::-1]
 
-target_dist = df.iloc[1833, -22:-1] #For now just do the check on the very first entry
+# target_dist = df.iloc[32, -22:-1] #For now just do the check on the very first entry
 
-plt.figure(0, figsize=(5,5))
+# plt.figure(0, figsize=(5,5))
 
-plt.plot(target_dist/target_dist.sum())
+# plt.plot(target_dist/target_dist.sum())
+# plt.xticks(rotation=45)
+# plt.xlabel("Age group")
+# plt.ylabel("P(age==x)")
+# plt.title("Age distribution")
+
+# plt.tight_layout()
+# plt.show()
+        
+# n_groups = len(target_dist) # Set number of groups to match age classes in data
+
+# target_dist_cum = np.cumsum(target_dist/target_dist.sum())
+
+numselect=125
+target_dist = df.iloc[numselect, -22:-1] #For now just do the check on the very first entry
+n_groups = len(target_dist) # Set number of groups to match age classes in data
+target_dist_cum = np.cumsum(target_dist/target_dist.sum())
+
+
+plt.figure(0, figsize=(8,4))
+
+plt.bar(height=target_dist/target_dist.sum(), x=target_dist.index)
 plt.xticks(rotation=45)
 plt.xlabel("Age group")
 plt.ylabel("P(age==x)")
-plt.title("Age distribution")
+plt.title(f"Age distribution: {df.iloc[numselect,3]}")
 
 plt.tight_layout()
+plt.savefig(f'agedist_empirical_{df.iloc[numselect,3]}.png', bbox_inches="tight", dpi=500)
 plt.show()
-        
-n_groups = len(target_dist) # Set number of groups to match age classes in data
 
-target_dist_cum = np.cumsum(target_dist/target_dist.sum())
-
+brap
 
 ## TEST OPTIMIZATION
 
@@ -117,9 +136,12 @@ while True:
         
         numerical_dist = obj_func(best_sol)[1]
         
-        plt.figure(1, figsize=(10,5))
+        numerical_dist_noncum = numerical_dist.copy()
+        numerical_dist_noncum[1:] -= numerical_dist_noncum[:-1].copy()
         
-        plt.subplot(121)
+        plt.figure(1, figsize=(12,4))
+        
+        plt.subplot(131)
         plt.plot(best_sol[:len(best_sol)//2], label =  "Survival probability")
         plt.plot(best_sol[len(best_sol)//2:], label = "Activation rate")
         plt.xticks(np.arange(n_groups), list(target_dist.index), rotation=45)
@@ -127,9 +149,20 @@ while True:
         plt.xlabel("Age group")
         plt.ylabel("Parameter value")
         
-        plt.subplot(122)
+        plt.subplot(132)
+        plt.plot(numerical_dist_noncum, label = "simulated")
+        plt.plot(target_dist/target_dist.sum(), label = "observed")
+        plt.plot()
+        plt.legend(title="Age distribution")
+        plt.xticks(rotation=45)
+        plt.xlabel("Age group (x)")
+        plt.ylabel("P(age group==x)")
+        plt.title("Age distribution")
+        
+        plt.subplot(133)
         plt.plot(numerical_dist, label = "simulated")
         plt.plot(target_dist_cum, label = "observed")
+        plt.plot()
         plt.legend(title="Age distribution")
         plt.xticks(rotation=45)
         plt.xlabel("Age group (x)")

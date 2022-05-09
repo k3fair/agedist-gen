@@ -109,7 +109,7 @@ def obj_func(survive_probas):
 
 ## GET DATA
 
-df = pd.read_csv('%sdata/agedists_other.csv' % home)
+df = pd.read_csv('%sdata/agedists_countries2020_md.csv' % home)
 
 
 ## TEST FUNCTION
@@ -129,22 +129,25 @@ max_itera = 1000
 # stepsize=5
 # target_dist = np.arange(1,stepsize*(n_groups),stepsize)[::-1]
 
-target_dist = df.iloc[1833, -22:-1] #For now just do the check on the very first entry
+numselect=3
+target_dist = df.iloc[numselect, -22:-1] #For now just do the check on the very first entry
 n_groups = len(target_dist) # Set number of groups to match age classes in data
 target_dist_cum = np.cumsum(target_dist/target_dist.sum())
 
 
-plt.figure(0, figsize=(5,5))
+plt.figure(0, figsize=(8,4))
 
-plt.plot(target_dist/target_dist.sum())
+plt.bar(height=target_dist/target_dist.sum(), x=target_dist.index)
 plt.xticks(rotation=45)
 plt.xlabel("Age group")
 plt.ylabel("P(age==x)")
-plt.title("Age distribution")
+plt.title(f"Age distribution: {df.iloc[numselect,3]}")
 
 plt.tight_layout()
+plt.savefig(f'agedist_empirical_{df.iloc[numselect,3]}.png', bbox_inches="tight", dpi=500)
 plt.show()
 
+brap
 ## p_n check
 print(f"Minimum possible p_n value: {p_n_min_getter(target_dist)}")
 
@@ -179,9 +182,12 @@ while True:
         
         numerical_dist = obj_func(best_sol)[1]
         
-        plt.figure(0, figsize=(10,5))
+        numerical_dist_noncum = numerical_dist.copy()
+        numerical_dist_noncum[1:] -= numerical_dist_noncum[:-1].copy()
         
-        plt.subplot(121)
+        plt.figure(0, figsize=(12,4))
+        
+        plt.subplot(131)
         plt.plot(best_sol, label = "numerical")
         plt.plot(analytic_solver(target_dist, best_sol[-1]), label = "analytical")
         plt.legend(title="Solution")
@@ -189,7 +195,17 @@ while True:
         plt.xlabel("Age group")
         plt.ylabel("Survival probability")
         
-        plt.subplot(122)
+        plt.subplot(132)
+        plt.plot(numerical_dist_noncum, label = "simulated")
+        plt.plot(target_dist/target_dist.sum(), label = "observed")
+        plt.plot()
+        plt.legend(title="Age distribution")
+        plt.xticks(rotation=45)
+        plt.xlabel("Age group (x)")
+        plt.ylabel("P(age group==x)")
+        plt.title("Age distribution")
+        
+        plt.subplot(133)
         plt.plot(numerical_dist, label = "simulated")
         plt.plot(target_dist_cum, label = "observed")
         plt.plot()
