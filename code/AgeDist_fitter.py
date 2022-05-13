@@ -100,9 +100,13 @@ fit_y_noncum[1:] -= fit_y_noncum[:-1].copy()
 
 # print(wasserstein_distance(target_dist_cum, fit_y_old))
 
-# Define the expoential decay equation we're using for fitting
-def decayfcn(x, A, b, k):
-    y = A*np.exp(-b*(x**k))
+startbin=10
+
+# Define the decay equation we're using for fitting
+def decayfcn(x, A, B, k):
+    
+    y = A*np.ones(len(x))
+    y[startbin:] = A*np.exp(-B*((x[startbin:] - x[startbin])**k))
     return y
 
 # Fit curve
@@ -110,11 +114,11 @@ ydat = np.asarray(target_dist/target_dist.sum())
 parameters, covariance = curve_fit(decayfcn, xdat, ydat)
 
 fit_A = parameters[0]
-fit_b = parameters[1]
+fit_B = parameters[1]
 fit_k = parameters[2]
 
-fit_y = decayfcn(xdat, fit_A, fit_b, fit_k)
-fit_y[fit_y>1] = 1 
+fit_y = decayfcn(xdat, fit_A, fit_B, fit_k)
+# fit_y[fit_y>1] = 1 
 
 wass_dist = wasserstein_distance(target_dist/target_dist.sum(), fit_y)
 
@@ -150,10 +154,12 @@ plt.tight_layout()
 plt.savefig(f'agedist_fitted_empirical_{df.iloc[numselect,3]}.png', bbox_inches="tight", dpi=500)
 plt.show()
 
-
+if abs(fit_y.sum()-1) > 0.01:
+    print("Fitted probabilties aren't summing nicely")
 
 # df_wassdist[i] = wass_dist
     
 # plt.figure(2, figsize=(10,5))    
 # plt.hist(df_wassdist)
 # plt.show()
+

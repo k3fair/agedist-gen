@@ -53,7 +53,7 @@ def obj_func(survive_probas):
     ages_final = ages_history[:,-100::].mean(axis=1)
     ages_dist = np.cumsum(ages_final/ages_final.sum())
     
-    return (np.max(np.abs(ages_dist - target_dist_cum)), ages_dist)
+    return (np.mean(np.abs(ages_dist - target_dist_cum)), ages_dist)
 
 # def obj_func(survive_probas):
     
@@ -129,7 +129,7 @@ max_itera = 1000
 # stepsize=5
 # target_dist = np.arange(1,stepsize*(n_groups),stepsize)[::-1]
 
-numselect=1
+numselect=37
 target_dist = df.iloc[numselect, -22:-1] #For now just do the check on the very first entry
 n_groups = len(target_dist) # Set number of groups to match age classes in data
 target_dist_cum = np.cumsum(target_dist/target_dist.sum())
