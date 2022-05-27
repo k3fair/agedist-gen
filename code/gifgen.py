@@ -14,7 +14,7 @@ from pygifsicle import optimize
 home =  os.getcwd()[:-4]
 
 fig_dir = f"{home}/data/gifimages"
-country="Egypt"
+country="Zimbabwe"
 
 filenames = sorted(glob.glob(f"{home}/data/gifimages/*{country}*.png"))
 filenames.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))

@@ -156,7 +156,7 @@ plt.show()
 ## TEST OPTIMIZATION
 
 best_fitness = 1000
-popsize = 64*1
+popsize = 64*4
 mut=0.8
 crossp=0.7
 parallel_processes = 64
@@ -167,7 +167,7 @@ min_b, max_b = np.asarray(bounds).T
 diff = np.fabs(min_b - max_b)
 dimensions = len(bounds)
 # pop =  np.random.rand(popsize, dimensions)*.8 + .2
-baseval = 0.7 #Minimum value for the initial parameter values
+baseval = 0.4 #Minimum value for the initial parameter values
 # pop_init = np.concatenate([np.random.rand(popsize, dimensions-1)*(1-baseval) + baseval, np.random.rand(popsize,1)*baseval + (1-baseval)], axis=1)
 pop_init = np.random.rand(popsize, dimensions)*(1-baseval) + baseval
 
