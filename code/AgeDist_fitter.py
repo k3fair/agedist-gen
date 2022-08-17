@@ -59,7 +59,7 @@ plt.show()
 # plt.show()
 
 # Generate array of dummy data matching the length of our target distribution
-xdat = np.arange(0, len(target_dist_cum))
+xdat = np.arange(0, len(target_dist_cum)) + 1
 
 xdat = np.asarray(xdat)
 ydat = np.asarray(target_dist_cum)
@@ -100,13 +100,13 @@ fit_y_noncum[1:] -= fit_y_noncum[:-1].copy()
 
 # print(wasserstein_distance(target_dist_cum, fit_y_old))
 
-startbin=10
+k=10
 
 # Define the decay equation we're using for fitting
-def decayfcn(x, A, B, k):
+def decayfcn(x, A, B, C):
     
     y = A*np.ones(len(x))
-    y[startbin:] = A*np.exp(-B*((x[startbin:] - x[startbin])**k))
+    y[k:] = A*np.exp(-B*((x[k:] - x[k])**C))
     return y
 
 # Fit curve
@@ -115,9 +115,9 @@ parameters, covariance = curve_fit(decayfcn, xdat, ydat)
 
 fit_A = parameters[0]
 fit_B = parameters[1]
-fit_k = parameters[2]
+fit_C = parameters[2]
 
-fit_y = decayfcn(xdat, fit_A, fit_B, fit_k)
+fit_y = decayfcn(xdat, fit_A, fit_B, fit_C)
 # fit_y[fit_y>1] = 1 
 
 wass_dist = wasserstein_distance(target_dist/target_dist.sum(), fit_y)
@@ -142,9 +142,9 @@ plt.show()
 
 plt.figure(0, figsize=(8,4))
 
-plt.bar(x=target_dist.index, height=target_dist/target_dist.sum(), label='data')
+plt.bar(x=xdat, height=target_dist/target_dist.sum(), label='data')
 plt.plot(xdat, fit_y, 'o-', color="orange", label='fit')
-plt.xticks(rotation=45)
+plt.xticks(rotation=45, ticks = 0.5 + np.arange(len(target_dist.index)), labels = target_dist.index)
 plt.xlabel("Age group")
 plt.ylabel("P(age==x)")
 plt.legend()

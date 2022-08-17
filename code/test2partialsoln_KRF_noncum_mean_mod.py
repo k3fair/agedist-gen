@@ -170,10 +170,10 @@ dimensions = len(bounds)
 baseval = 0.4 #Minimum value for the initial parameter values
 # pop_init = np.concatenate([np.random.rand(popsize, dimensions-1)*(1-baseval) + baseval, np.random.rand(popsize,1)*baseval + (1-baseval)], axis=1)
 pop_init = np.random.rand(popsize, dimensions)*(1-baseval) + baseval
-
+brap
 # pop_init =  np.random.rand(popsize, dimensions)
 pop = np.array(Parallel(n_jobs=parallel_processes, verbose=0)(delayed(pop_refine)(pop_member) for pop_member in pop_init))
-
+brap
 best_sols = []
 
 step = 0

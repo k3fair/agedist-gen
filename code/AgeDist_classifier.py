@@ -33,20 +33,20 @@ df["monocheck"] = mono_check
 df.loc[df.monocheck==1].to_csv('%sdata/agedists_md.csv' % home) 
 df.loc[df.monocheck==0].to_csv('%sdata/agedists_other.csv' % home) 
 
-# Subset to get only country-level distributions for most recent year (2020)
+# Subset to get only country-level distributions for most recent year (2019)
 df_countries = df.loc[df.Type=="Country/Area"] 
-df_countries_2020 = df_countries.loc[df_countries["Reference date (as of 1 July)"]==2020]
-df_countries_2020_other=df_countries_2020.loc[df_countries_2020.monocheck==0]
-df_countries_2020_md=df_countries_2020.loc[df_countries_2020.monocheck==1]
+df_countries_2019 = df_countries.loc[df_countries["Reference date (as of 1 July)"]==2019]
+df_countries_2019_other=df_countries_2019.loc[df_countries_2019.monocheck==0]
+df_countries_2019_md=df_countries_2019.loc[df_countries_2019.monocheck==1]
 
-dec_count=np.zeros(df_countries_2020_other.shape[0])
-for i in range(df_countries_2020_other.shape[0]):
+dec_count=np.zeros(df_countries_2019_other.shape[0])
+for i in range(df_countries_2019_other.shape[0]):
     
-    dif_list = np.array([j-i for i, j in zip(df_countries_2020_other.iloc[i, -22:-2], df_countries_2020_other.iloc[i, 9:-1])])
+    dif_list = np.array([j-i for i, j in zip(df_countries_2019_other.iloc[i, -22:-2], df_countries_2019_other.iloc[i, 9:-1])])
     dec_count[i] = len(dif_list[dif_list<=0])
     
     # if dec_count[i] >=19:
-    #     plt.plot(df_countries_2020_other.iloc[i, -22:-1]/df_countries_2020_other.iloc[i, -22:-1].sum())
+    #     plt.plot(df_countries_2019_other.iloc[i, -22:-1]/df_countries_2019_other.iloc[i, -22:-1].sum())
     #     plt.xticks(rotation=45)
     #     plt.xlabel("Age group")    
     #     plt.show()
@@ -59,13 +59,13 @@ for i in range(df_countries_2020_other.shape[0]):
 plt.hist(dec_count)
 plt.show()
 
-for i in range(df_countries_2020_other.shape[0]):
+for i in range(df_countries_2019_other.shape[0]):
     
-    plt.plot(np.cumsum(df_countries_2020_other.iloc[i, -22:-1]/df_countries_2020_other.iloc[i, -22:-1].sum()), 'b', label="Other")
+    plt.plot(np.cumsum(df_countries_2019_other.iloc[i, -22:-1]/df_countries_2019_other.iloc[i, -22:-1].sum()), 'b', label="Other")
     
-for i in range(df_countries_2020_md.shape[0]):
+for i in range(df_countries_2019_md.shape[0]):
     
-    plt.plot(np.cumsum(df_countries_2020_md.iloc[i, -22:-1]/df_countries_2020_md.iloc[i, -22:-1].sum()), 'r--', label = "Monotonic decreasing")
+    plt.plot(np.cumsum(df_countries_2019_md.iloc[i, -22:-1]/df_countries_2019_md.iloc[i, -22:-1].sum()), 'r--', label = "Monotonic decreasing")
     
 plt.xticks(rotation=45)
 plt.xlabel("Age group")
@@ -73,5 +73,5 @@ plt.xlabel("Age group")
 plt.show()
 
 # Save 2 sets of age distributions, monotonic decreasing (md) and other
-df_countries_2020_md.to_csv('%sdata/agedists_countries2020_md.csv' % home) 
-df_countries_2020_other.to_csv('%sdata/agedists_countries2020_other.csv' % home) 
+df_countries_2019_md.to_csv('%sdata/agedists_countries2019_md.csv' % home) 
+df_countries_2019_other.to_csv('%sdata/agedists_countries2019_other.csv' % home) 
