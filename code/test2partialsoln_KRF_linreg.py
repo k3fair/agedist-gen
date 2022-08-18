@@ -9,6 +9,7 @@ Model 2: agents are subjected to the survival process of model 1 only if they
 '''
 ###########################################################################
 import matplotlib.pyplot as plt
+import seaborn as sns
 import pandas as pd
 import numpy as np
 import os, warnings
@@ -27,10 +28,14 @@ def pop_refine(pop_member): #Updates any initial parameter guesses that would vi
         while any(x > 1 for x in survive_probas):
             # pop[i,:] = np.concatenate([np.random.rand(dimensions-1)*(1-baseval) + baseval, np.random.rand(1)*baseval + (1-baseval)])
             pop_member = np.random.rand(dimensions)*(1-baseval) + baseval
+            pop_member[-1] = np.random.rand() #baseval argument is only to pick activation rates to return valid survival probabilties, final entry is p_n (survival probability of oldest age class) and so can just be chosen randomly
+
             # pop[i,:] = np.random.rand(dimensions)
             parm_vectors = analytic_solver(pop_member)
             activation_rates, survive_probas = parm_vectors
-            
+        
+        print("done")    
+        
         return pop_member
 
 
@@ -75,6 +80,21 @@ def obj_func_solver(solution):
         
         uages, freqs = np.unique(ages, return_counts=True)
         ages_history[uages, itera] = freqs
+        
+        # if itera == max_itera-1:
+            
+        #     plt.figure(0, figsize=(6,4))
+            
+        #     for i in range(n_groups):
+        #         plt.plot(ages_history[i,:], color = palette[i])
+        #     plt.xlabel("Timestep")
+        #     plt.ylabel("# of individuals in age class")
+        #     plt.xlim([0,max_itera-1])
+        #     plt.title(f"Population: {df.iloc[numselect,3]}")
+            
+        #     plt.tight_layout()
+        #     # plt.savefig(f'timeseries_{df.iloc[numselect,3]}_model_fitted.png', bbox_inches="tight", dpi=500)
+        #     plt.show()
 
     ages_final = ages_history[:,-100::].mean(axis=1)
     ages_dist_noncum = ages_final/ages_final.sum()
@@ -88,7 +108,7 @@ def obj_func_simpler(activation_rates, survive_probas):
     
     for itera in range(max_itera):
         
-        active = activation_rates[ages] < np.random.rand(pop_size)
+        active = activation_rates[ages] > np.random.rand(pop_size)
         # active = np.ones(pop_size).astype(bool) # uncomment to use model 1
         trials = np.random.rand(pop_size)
         survival_probabilities = survive_probas[ages]
@@ -120,12 +140,12 @@ def unpacker(output,entry): #To unpack results from simulations
 
 ## GET DATA
 
-df = pd.read_csv('%sdata/agedists_countries2019_md.csv' % home)
+df = pd.read_csv('%sdata/agedists_countries2019_other.csv' % home)
 
 ## TEST FUNCTION
 
-pop_size = 1000
-max_itera = 1000
+pop_size = 10000
+max_itera = 250
 # n_groups = 90-18
 
 # survive_probas = 1 - np.random.rand(91)*.1
@@ -156,7 +176,7 @@ max_itera = 1000
 
 # target_dist_cum = np.cumsum(target_dist/target_dist.sum())
 
-numselect=37 #6
+numselect=122 #6
 target_dist_full = df.iloc[numselect, -22:-1] #For now just do the check on the very first entry
 target_dist = target_dist_full[target_dist_full>0].copy() #Drop all age classes containing zero individuals (can be absorbed into a neighbouring class)
 
@@ -164,6 +184,8 @@ n_groups = len(target_dist) # Set number of groups to match age classes in data
 target_dist_noncum = target_dist/target_dist.sum()
 target_dist_cum = np.cumsum(target_dist/target_dist.sum())
 
+# generate colour palette based on n_groups
+palette = sns.color_palette("flare", n_groups)
 
 # plt.figure(0, figsize=(8,4))
 
@@ -180,18 +202,20 @@ target_dist_cum = np.cumsum(target_dist/target_dist.sum())
 
 ## TEST OPTIMIZATION
 
-popsize = 5000
-parallel_processes = 64
+popsize = 100
+parallel_processes = -1 #use all available CPUs
 
 # bounds = np.array(list(zip(np.zeros(n_groups*2), np.ones(n_groups*2))))
-bounds = np.array(list(zip(1e-6+np.zeros(n_groups + 1), np.ones(n_groups + 1))))
+bounds = np.array(list(zip(1e-6+np.zeros(n_groups + 1), np.ones(n_groups + 1)))) # adding +1 because we want to generate 21 activation rates, and p_n the final surivival probability
 min_b, max_b = np.asarray(bounds).T
 diff = np.fabs(min_b - max_b)
 dimensions = len(bounds)
 # pop =  np.random.rand(popsize, dimensions)*.8 + .2
-baseval = 0.4 #Minimum value for the initial parameter values
+baseval = 0.4 #Minimum value for the initial parameter values (pick a value that admits valid sivival probabilities)
 # pop_init = np.concatenate([np.random.rand(popsize, dimensions-1)*(1-baseval) + baseval, np.random.rand(popsize,1)*baseval + (1-baseval)], axis=1)
 pop_init = np.random.rand(popsize, dimensions)*(1-baseval) + baseval
+pop_init[:,-1] = np.random.rand(popsize) #baseval argument is only to pick activation rates to return valid survival probabilties, final entry is p_n (survival probability of oldest age class) and so can just be chosen randomly
+
 # pop_init =  np.random.rand(popsize, dimensions)
 pop = np.array(Parallel(n_jobs=parallel_processes, verbose=0)(delayed(pop_refine)(pop_member) for pop_member in pop_init))
 

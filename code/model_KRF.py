@@ -68,7 +68,7 @@ def obj_func(survive_probas):
     # uages, freqs = np.unique(ages, return_counts=True)
     # ages_final[uages] = freqs
     ages_final = ages_history[:,-100::].mean(axis=1)
-    ages_dist = np.cumsum(ages_final/ages_final.sum())
+    # ages_dist = np.cumsum(ages_final/ages_final.sum())
     ages_dist_noncum = ages_final/ages_final.sum()
     
     return (np.mean(np.abs(ages_dist_noncum - target_dist_noncum)), ages_dist_noncum)
