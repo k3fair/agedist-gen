@@ -23,3 +23,16 @@ You will find all instructions for running simulations [here](TKTK) within the c
 ## System & Hardware Requirements
 
 * macOS Monterey version 12.6 (or similar)
+
+* Sufficient RAM to support storage of data structures during simulations
+
+## Installation Guides
+
+All software should install within a few minutes on a standard computer, the versions listed here are those the scripts have been tested on.
+
+* Python Version 3.9.12 https://www.python.org/downloads/
+* Spyder Version 5.3.3 (IDE for python) https://www.spyder-ide.org/
+
+## Acknowledgements
+
+This work was supported by Wave 1 of The UKRI Strategic Priorities Fund under the EPSRC Grant EP/W006022/1, particularly the "Shocks and Resilience" theme within that grant & The Alan Turing Institute.
