@@ -11,6 +11,7 @@ Model 2: agents are subjected to the survival process of model 1 only if they
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import seaborn as sns
 import os, warnings
 from joblib import Parallel, delayed
 
@@ -24,6 +25,9 @@ def pop_refine(pop_member):
         parm_vectors = analytic_solver(pop_member)
         activation_rates, survive_probas = parm_vectors
         
+        fix_attempt = 0
+        
+        # Pick survival probabilties
         while any(x > 1 for x in survive_probas):
             # pop[i,:] = np.concatenate([np.random.rand(dimensions-1)*(1-baseval) + baseval, np.random.rand(1)*baseval + (1-baseval)])
             pop_member = np.random.rand(dimensions)*(1-baseval) + baseval
@@ -33,6 +37,15 @@ def pop_refine(pop_member):
             parm_vectors = analytic_solver(pop_member)
             activation_rates, survive_probas = parm_vectors
             
+            fix_attempt += 1
+            
+            if fix_attempt == 1e3:
+                
+                # print("User may want to consider curve fitting approach for their age distribution if this message appears frequently.")
+                break # if too many attempts to set the paramters (s.t. survival probabilty values don't exceed 1) have been made move on
+        
+        # print("done")
+        
         return pop_member
 
 
@@ -97,7 +110,7 @@ def obj_func(solution):
 
 ## GET DATA
 
-df = pd.read_csv('%sdata/agedists_countries2020_other.csv' % home)
+df = pd.read_csv('%sdata/agedists_countries2019_other.csv' % home)
 
 ## TEST FUNCTION
 
@@ -133,7 +146,7 @@ max_itera = 250
 
 # target_dist_cum = np.cumsum(target_dist/target_dist.sum())
 
-numselect=6
+numselect=0
 target_dist_full = df.iloc[numselect, -22:-1] #For now just do the check on the very first entry
 target_dist = target_dist_full[target_dist_full>0].copy() #Drop all age classes containing zero individuals (can be absorbed into a neighbouring class)
 
@@ -142,17 +155,17 @@ target_dist_noncum = target_dist/target_dist.sum()
 target_dist_cum = np.cumsum(target_dist/target_dist.sum())
 
 
-plt.figure(0, figsize=(8,4))
+# plt.figure(0, figsize=(8,4))
 
-plt.bar(height=target_dist/target_dist.sum(), x=target_dist.index)
-plt.xticks(rotation=45)
-plt.xlabel("Age group")
-plt.ylabel("P(age==x)")
-plt.title(f"Age distribution: {df.iloc[numselect,3]}")
+# plt.bar(height=target_dist/target_dist.sum(), x=target_dist.index)
+# plt.xticks(rotation=45)
+# plt.xlabel("Age group")
+# plt.ylabel("P(age==x)")
+# plt.title(f"Age distribution: {df.iloc[numselect,3]}")
 
-plt.tight_layout()
-# plt.savefig(f'agedist_empirical_{df.iloc[numselect,3]}.png', bbox_inches="tight", dpi=300)
-plt.show()
+# plt.tight_layout()
+# # plt.savefig(f'agedist_empirical_{df.iloc[numselect,3]}.png', bbox_inches="tight", dpi=300)
+# plt.show()
 
 
 ## TEST OPTIMIZATION
@@ -162,6 +175,7 @@ popsize = 100
 mut=0.8
 crossp=0.7
 parallel_processes = -1 #use all available CPUs
+algthresh = 7.5e-5 # Set the threshold for stoppping the fitting algorithm
 
 # bounds = np.array(list(zip(np.zeros(n_groups*2), np.ones(n_groups*2))))
 bounds = np.array(list(zip(1e-6+np.zeros(n_groups + 1), np.ones(n_groups + 1))))
@@ -179,10 +193,16 @@ pop = np.array(Parallel(n_jobs=parallel_processes, verbose=0)(delayed(pop_refine
 
 best_sols = []
 
+# Plotting parameters
+cap = [ "A", "B", "C"]
+
+subcap_x = -0.05
+subcap_y = 1.05
+
 step = 0
 figcapture=0
 while True:
-    print(step)
+    # print(step)
     
     output = Parallel(n_jobs=parallel_processes, verbose=0)(delayed(obj_func)(sol) for sol in pop) # Parallel
     fitness = [x[0] for x in output]
@@ -203,25 +223,27 @@ while True:
         # numerical_dist_noncum = numerical_dist.copy()
         # numerical_dist_noncum[1:] -= numerical_dist_noncum[:-1].copy()
         
-        plt.figure(1, figsize=(12,4))
+        plt.figure(1, figsize=(6,6))
         
-        plt.subplot(121)
-        plt.plot(survive_probas, label =  "Survival probability")
-        plt.plot(activation_rates, label = "Activation rate")
-        plt.xticks(np.arange(n_groups), list(target_dist.index), rotation=45)
+        plt.subplot(211)
+        ax1 = sns.lineplot(x=target_dist.index, y =survive_probas, label =  "Survival probability")
+        ax1.text(subcap_x, subcap_y, cap[0], transform=ax1.transAxes, size=9, weight='bold')
+        sns.lineplot(x=target_dist.index, y =activation_rates, label = "Activation rate")
+        plt.xticks(np.arange(n_groups), [])
         plt.legend(title="Parameter", loc = "lower left")
-        plt.xlabel("Age group")
+        plt.xlabel("")
         plt.ylabel("Parameter values")
-        plt.title(f"Parameter values: {df.iloc[numselect,3]}")
+        # plt.title(f"Parameter values: {df.iloc[numselect,3]}")
         
-        plt.subplot(122)
-        plt.bar(x=target_dist.index, height=target_dist_noncum, label = "observed")
-        plt.plot(numerical_dist_noncum,  'o-', color="orange", label = "simulated")
-        plt.legend(title="Age distribution", loc = "upper right")
+        plt.subplot(212)
+        ax2=sns.barplot(x=target_dist.index, y=target_dist_noncum, label = "observed", color = '#1f77b4')
+        ax2.text(subcap_x, subcap_y, cap[1], transform=ax2.transAxes, size=9, weight='bold') 
+        plt.plot(numerical_dist_noncum, "o--", color="orange", markerfacecolor='none', label = "simulated")
+        plt.legend(title=f"Age distribution: {df.iloc[numselect,3]}")
         plt.xticks(rotation=45)
-        plt.xlabel("Age group (x)")
-        plt.ylabel("P(age group==x)")
-        plt.title(f"Age distribution: {df.iloc[numselect,3]}")
+        plt.xlabel(r"Age group ($i$)")
+        plt.ylabel(r"P(age group==$i$)")
+        # plt.title(f"Age distribution: {df.iloc[numselect,3]}")
         
         # plt.subplot(133)
         # plt.bar(x=target_dist.index, height=target_dist_cum, label = "observed")
@@ -234,10 +256,17 @@ while True:
         # plt.title("Cumulative age distribution")
         
         plt.tight_layout()
-        plt.savefig(f'{home}data/gifimages/agedist_activationmodel_{df.iloc[numselect,3]}_fig{figcapture}.png', bbox_inches="tight", dpi=300)
+        # plt.savefig(f'{home}data/gifimages/agedist_activationmodel_{df.iloc[numselect,3]}_fig{figcapture}.png', bbox_inches="tight", dpi=300)
+        plt.savefig(f'agedist_{df.iloc[numselect,3]}_model2_activation.png', bbox_inches="tight", dpi=300)
         plt.show()
         
         figcapture += 1
+        
+    if best_fitness < algthresh:
+        
+        pd.DataFrame(best_sol).to_csv('%sdata/bestparms_{df.iloc[numselect,3]}_model2_activation.csv' % home) 
+        print("Desired accuracy has been achieved, ending fitting.")
+        break  
 
     # check = np.array(fitness)
     # len(check[check<1000])
@@ -262,6 +291,9 @@ while True:
     pop = np.array(Parallel(n_jobs=parallel_processes, verbose=0)(delayed(pop_refine)(pop_member) for pop_member in np.array(new_pop)))
     
     step += 1
+    
+    if step == 100:
+        print("Having gone through 100 iterations of the fitting algorithm without achieving the desired accuracy, you may wish to consider reducing the required accuracy or switching to the curve fitting approach.")
 
 
 

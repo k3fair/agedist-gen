@@ -231,7 +231,7 @@ plt.ylabel(r"P(age group==$i$)")
 # plt.title("Cumulative age distribution")
 
 plt.tight_layout()
-plt.savefig(f'agedist_{df.iloc[numselect,3]}_model.png', bbox_inches="tight", dpi=500)
+plt.savefig(f'agedist_{df.iloc[numselect,3]}_model1.png', bbox_inches="tight", dpi=500)
 plt.show()
 
 # ## TEST OPTIMIZATION

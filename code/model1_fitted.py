@@ -13,7 +13,7 @@ import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.optimize import curve_fit
-# from scipy.stats import wasserstein_distance
+from scipy.stats import wasserstein_distance
 
 # Set working directory
 home =  os.getcwd()[:-4]
@@ -71,7 +71,7 @@ def obj_func(survive_probas):
             plt.title(f"Population: {df.iloc[numselect,3]}")
             
             plt.tight_layout()
-            plt.savefig(f'timeseries_{df.iloc[numselect,3]}_model_fitted.png', bbox_inches="tight", dpi=500)
+            plt.savefig(f'timeseries_{df.iloc[numselect,3]}_model1_fitted.png', bbox_inches="tight", dpi=500)
             plt.show()
 
     # ages_final = np.zeros(n_groups)
@@ -190,7 +190,7 @@ fit_y = decay_fcn(xdat, fit_A, fit_B, fit_C)
 
 # wass_dist = wasserstein_distance(target_dist/target_dist.sum(), fit_y)
 
-# print(wass_dist)
+# print(f'Wasserstein distance is: {wass_dist}')
 
 # if wass_dist > 0.01:
 
@@ -340,7 +340,12 @@ plt.ylabel(r"P(age group==$i$)")
 # plt.title("Cumulative age distribution")
 
 plt.tight_layout()
-plt.savefig(f'agedist_{df.iloc[numselect,3]}_model_fitted.png', bbox_inches="tight", dpi=500)
+plt.savefig(f'agedist_{df.iloc[numselect,3]}_model1_fitted.png', bbox_inches="tight", dpi=500)
 plt.show()
+
+wass_dist = wasserstein_distance(target_dist_noncum, fit_y)
+
+print(f'Wasserstein distance is: {wass_dist}')
+
 
 
