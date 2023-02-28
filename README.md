@@ -1,4 +1,4 @@
-# A Method for Emerging Empirical Age Structures in Agent-Based Models **[UNDER CONSTRUCTION]**
+# Emerging Empirical Age Structures in Agent-Based Models **[UNDER CONSTRUCTION]**
 
 This public repository contains code and data associated with the method we have developed for emerging age structures in agent-based models. The associated preprint is posted at TKTKTK.
 
