@@ -10,13 +10,11 @@ You will find all instructions for running simulations [here](TKTK) within the c
 
 ```
 ├── LICENSE
-├── README.md                 <- README for project users.
+├── README.md   <- README for project users.
 │
-├── data                      <- All data required to run the model.
+├── data        <- All data required to run the model.
 │
-├── code               
-│   ├── preprocessing         <- Python scripts and notebooks used to classify age distributions.
-│   └── simulation            <- Python scripts and notebooks used to run model simulations.
+├── code        <- Python scripts and notebooks used to classify age distributions and run model simulations.
 └──
 ```
 
