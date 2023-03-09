@@ -16,7 +16,7 @@ You will find all instructions for running simulations [here](TKTK) within the c
 │   ├── required    <- All data required to run the model.
 │   └── results     <- All simulation results.
 │
-├── code            <- Python scripts and notebooks used to classify age distributions and run model simulations.
+├── code            <- Jupyter notebooks for classifying age distributions and running simulations.
 └──
 ```
 
