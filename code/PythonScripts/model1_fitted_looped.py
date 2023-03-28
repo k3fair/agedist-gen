@@ -11,14 +11,16 @@ Code containing functions needed to create a monotonic decreasing fit to an obse
 #Load in required libraries
 import pandas as pd
 import numpy as np
-import os
+import os, warnings
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.optimize import curve_fit
 from scipy.stats import wasserstein_distance
 
+warnings.simplefilter("ignore")
+
 # Set working directory
-home =  os.getcwd()[:-4]
+home =  os.getcwd()[:-18]
 
 ## DEFINE FUNCTIONS
 
@@ -94,12 +96,12 @@ def decay_fcn(x, A, B, C):
 
 
 # Read in age distribution data for distributions which are not monotonic decreasing
-df_full = pd.read_csv(f'{home}data/agedists_countries2019_other.csv')
+df_full = pd.read_csv(f'{home}data/required/agedists_countries2019_other.csv')
 
 # Read in list of countries that model 2 was not successful in simulating
 algthresh = 1e-4 # Set the threshold for stoppping the fitting algorithm - from model 2, leave as-is
 maxsteps = 250 # Maximum number of steps to run of the fitting algorithm - from model 2, leave as-is
-df_failed = pd.read_csv(f'{home}data/agedists_other_model2failed_thresh{algthresh}_maxsteps{maxsteps}.csv')
+df_failed = pd.read_csv(f'{home}data/required/agedists_other_model2failed_thresh{algthresh}_maxsteps{maxsteps}.csv')
 
 # Keep only age distributions for countries where model 2 failed
 df = df_full[df_full['Region, subregion, country or area *'].isin(df_failed['0'])]
@@ -117,7 +119,7 @@ wass_storage = []
 
 for i in range(df.shape[0]):
 
-    numselect=77 #i # Select index of the age distribution you want to simulate
+    numselect=i # Select index of the age distribution you want to simulate
     target_dist_full = df.iloc[numselect, -22:-1]
     target_dist = target_dist_full[target_dist_full>0].copy() #Drop all age classes containing zero individuals (can be absorbed into a neighbouring class)
     n_groups = len(target_dist) # Set number of groups to match the number of age classes in the data
@@ -242,7 +244,6 @@ for i in range(df.shape[0]):
     k = best_k
     fit_y = decay_fcn(xdat, fit_A, fit_B, fit_C)
     
-    break
     # fit_y[fit_y>1] = 1 
     
     # wass_dist = wasserstein_distance(target_dist/target_dist.sum(), fit_y)
@@ -401,7 +402,7 @@ for i in range(df.shape[0]):
     # plt.title("Cumulative age distribution")
     
     plt.tight_layout()
-    plt.savefig(f'{home}data/agedist_{df.iloc[numselect,3]}_model1_fitted.png', bbox_inches="tight", dpi=500)
+    # plt.savefig(f'{home}data/results/agedist_{df.iloc[numselect,3]}_model1_fitted.png', bbox_inches="tight", dpi=500)
     plt.show()
     
     wass_dist = wasserstein_distance(target_dist_noncum, fit_y)
@@ -423,7 +424,8 @@ plt.figure(0, figsize=(6,3))
 
 sns.histplot(wass_storage, color = '#1f77b4')
 plt.ylabel(r"Count")
+plt.xlabel("Wasserstein metric")
 
 plt.tight_layout()
-plt.savefig(f'{home}data/wassdists_model1_fitted.png', bbox_inches="tight", dpi=500)
+# plt.savefig(f'{home}data/results/wassdists_model1_fitted.png', bbox_inches="tight", dpi=500)
 plt.show()
