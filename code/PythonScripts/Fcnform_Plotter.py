@@ -34,8 +34,6 @@ def decay_fcn(x, A, B, C):
 xdat = np.arange(0, 10, 0.1)
 k=0
 
-plt.figure(1, figsize=(10,5))
-
 plt.subplot(121)
 plt.plot(xdat, decay_fcn(xdat,1,1,1), '-', label='A=1,    B=1,    C=1,    k=0')
 # plt.plot(xdat, decayfcn(xdat,0.5,0.5,1), '-', label='A=0.5, B=1,    C=1')
@@ -97,7 +95,10 @@ plt.savefig('agedistfitter_demo4.png', bbox_inches="tight", dpi=500)
 plt.show()
 
 
-plt.figure(1, figsize=(10,5))
+dpi_val = 75
+
+# Generate histogram of wasserstein metric values
+plt.figure(0, figsize=(600/dpi_val, 300/dpi_val), dpi=dpi_val)
 
 plt.subplot(121)
 plt.plot(xdat, decay_fcn(xdat,1,1,1), '-', label='A=1,    B=1,    C=1,    k=0')
@@ -111,5 +112,5 @@ plt.ylabel("y")
 plt.legend(title="Parameters")
 
 plt.tight_layout()
-plt.savefig('agedistfitter_demo5.png', bbox_inches="tight", dpi=500)
+plt.savefig('agedistfitter_demo5.png', bbox_inches="tight")
 plt.show()

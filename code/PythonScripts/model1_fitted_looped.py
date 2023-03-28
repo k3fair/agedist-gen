@@ -420,12 +420,15 @@ for i in range(df.shape[0]):
 # df_failed.to_csv(f'{home}data/agedists_other_model1fitted_failed.csv', index=False,encoding='utf-8-sig') 
 
 
-plt.figure(0, figsize=(6,3))
+dpi_val = 100
+
+# Generate histogram of wasserstein metric values
+plt.figure(0, figsize=(600/dpi_val, 300/dpi_val), dpi=dpi_val)
 
 sns.histplot(wass_storage, color = '#1f77b4')
 plt.ylabel(r"Count")
 plt.xlabel("Wasserstein metric")
 
 plt.tight_layout()
-# plt.savefig(f'{home}data/results/wassdists_model1_fitted.png', bbox_inches="tight", dpi=500)
+plt.savefig(f'{home}data/results/wassdists_model1_fitted.png', bbox_inches="tight", dpi=500)
 plt.show()
