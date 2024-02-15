@@ -27,7 +27,7 @@ import os, warnings
 # from joblib import Parallel, delayed
 
 warnings.simplefilter("ignore")
-home =  os.getcwd()[:-4] # Set working directory
+home =  os.getcwd()[:-18] # Set working directory
 
 ## DEFINE FUNCTIONS
 
@@ -149,7 +149,7 @@ def obj_func(survive_probas): # Run simulation
 ## GET DATA
 
 # Read in monotic decreasing (md) age distributions, as model 1 is appropriate for these
-df = pd.read_csv(f'{home}data/agedists_countries2019_md.csv')
+df = pd.read_csv(f'{home}data/required/agedists_countries2019_md.csv')
 
 
 ## TEST FUNCTION
@@ -255,7 +255,7 @@ plt.ylabel(r"P(age group==$i$)")
 # plt.title("Cumulative age distribution")
 
 plt.tight_layout()
-plt.savefig(f'{home}data/agedist_{df.iloc[numselect,3]}_model1.png', bbox_inches="tight", dpi=500)
+plt.savefig(f'{home}data/agedist_{df.iloc[numselect,3]}_model1.png', bbox_inches="tight", dpi=1000)
 plt.show()
 
 # ## TEST OPTIMIZATION

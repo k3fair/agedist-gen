@@ -95,10 +95,10 @@ plt.savefig('agedistfitter_demo4.png', bbox_inches="tight", dpi=500)
 plt.show()
 
 
-dpi_val = 75
+dpi_val = 1000
 
 # Generate histogram of wasserstein metric values
-plt.figure(0, figsize=(600/dpi_val, 300/dpi_val), dpi=dpi_val)
+plt.figure(0, figsize=((14*600)/dpi_val, (14*300)/dpi_val), dpi=dpi_val)
 
 plt.subplot(121)
 plt.plot(xdat, decay_fcn(xdat,1,1,1), '-', label='A=1,    B=1,    C=1,    k=0')
